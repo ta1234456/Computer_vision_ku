@@ -1,9 +1,10 @@
- folderPath = 'lymphomalplzhang03_shade.jpg';
- tempIm = imread(folderPath);
- imGrayScale = rgb2gray(tempIm);
+RGB = imread('lymphomalplzhang03_shade.jpg');   % Read RGB image
+R = rgb2gray(RGB);           % Convert to grayscale
+imshow(R);                   % Display grayscale image
 
- filterSize = 601; 
- filteredImage = imboxfilt(imGrayScale, filterSize);
+
+ filterSize = 1025; 
+ filteredImage = imboxfilt(R, filterSize);
  DfilteredImage= double(filteredImage);
  DimGrayScale = double(imGrayScale);
 

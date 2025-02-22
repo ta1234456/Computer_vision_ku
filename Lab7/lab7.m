@@ -1,57 +1,52 @@
-folderPath = '/Users/mimoais/Downloads/KU /Computer Vision/Lab7/starbucks35_dataset'; 
-
-I = imread('reference_sm.jpg');  % Read the image
-grayI = rgb2gray(I);      % Convert to grayscale if needed
-points = detectHarrisFeatures(grayI);  % Detect Harris corners
-points2 = detectSURFFeatures(grayI);
-points3 = detectMSERFeatures(grayI);
-
-inputImage = imread('starbucks35_dataset/21.jpg');
-grayInput = rgb2gray(inputImage); 
-points4 = detectSURFFeatures(grayInput);
-points5 = detectHarrisFeatures(grayInput);
-points6 = detectMSERFeatures(grayInput);
-
-%gray ref
-[refFeatures,refValidPoints]= extractFeatures(grayI,points2);
-[inputFeatures, inputValidPoints] = extractFeatures(grayInput, points4);
-
-indexPairs = matchFeatures(refFeatures, inputFeatures);
-
-matchedRefPoints = refValidPoints(indexPairs(:, 1));
-matchedInputPoints = inputValidPoints(indexPairs(:, 2));
+folderPath = 'F:\GitSourceTree\Computer_vision_ku\Lab7\starbucks35_dataset'; 
+fileType = '*.jpg'; % ตัวอย่างสำหรับไฟล์ภาพ .jpg
+fileList = dir(fullfile(folderPath, fileType));
+fileCount = numel(fileList);
 
 
+I_ref = imread('reference_sm.jpg');  % Read the image
+grayI_ref = rgb2gray(I_ref);      % Convert to grayscale if needed
+HarrispointRef = detectHarrisFeatures(grayI_ref);  % Detect Harris corners
+SURFFpointRef = detectSURFFeatures(grayI_ref);
+MSERpointsRef = detectMSERFeatures(grayI_ref);
+
+[refFeaturesHarris, refValidPointsHarris] = extractFeatures(grayI_ref, HarrispointRef);
+[refFeaturesSURFF, refValidPointsSURFF] = extractFeatures(grayI_ref, SURFFpointRef);
+[refFeaturesMSER, refValidPointsMSER] = extractFeatures(grayI_ref, MSERpointsRef);
+k=0;
 figure;
-subplot(1, 4, 1); imshow(I);hold on; plot(points.selectStrongest(50));title('HarrisFeatures');
-subplot(1, 4, 2); imshow(I);hold on; plot(points2.selectStrongest(50));title('SURFFeatures');
-subplot(1, 4, 3); imshow(I);hold on; plot(points3, 'showEllipses', true);title('MSERFeatures');
-subplot(1, 4, 4); imshow(inputImage);hold on; plot(points4.selectStrongest(50));title('SURFFeatures');
-figure;
-subplot(1, 1, 1); showMatchedFeatures(I, inputImage, matchedRefPoints, matchedInputPoints, 'montage');title('Matched SURF Features');
+for i = 1:fileCount 
+    list_image= imread(fileList(1).folder+"/"+fileList(i).name);
+    grayImageInput=rgb2gray(list_image); 
+    HarrispointsInput= detectHarrisFeatures(grayImageInput);
+    SURFFpoints= detectSURFFeatures(grayImageInput);
+    MSERpoints= detectMSERFeatures(grayImageInput);
 
+    [inputFeaturesHarris, inputValidPointsHarris] = extractFeatures(grayImageInput, HarrispointsInput);
+    indexPairsHarris = matchFeatures(refFeaturesHarris, inputFeaturesHarris, 'Method','Threshold','MatchThreshold', 20);
+    matchedPointsHarrisRef = refValidPointsHarris(indexPairsHarris(:, 1)); 
+    matchedPointsHarrisInput = inputValidPointsHarris(indexPairsHarris(:, 2)); 
 
-[refFeaturesHarris,refValidPointsHarris]= extractFeatures(grayI,points);
-[inputFeaturesHarris, inputValidPointsHarris] = extractFeatures(grayInput, points5);
+    [inputFeaturesSURFF, inputValidPointsSURFF] = extractFeatures(grayImageInput, SURFFpoints);
+    indexPairsSURFF = matchFeatures(refFeaturesSURFF, inputFeaturesSURFF);
+    matchedPointsSURFFRef = refValidPointsSURFF(indexPairsSURFF(:, 1)); 
+    matchedPointsSURFFInput = inputValidPointsSURFF(indexPairsSURFF(:, 2));
 
-indexPairsHarris = matchFeatures(refFeaturesHarris, inputFeaturesHarris, 'MatchThreshold', 5);
+    [inputFeaturesMSER, inputValidPointsMSER] = extractFeatures(grayImageInput, MSERpoints);
+    indexPairsMSER= matchFeatures(refFeaturesMSER, inputFeaturesMSER,'Method','NearestNeighborRatio', 'MatchThreshold', 4, 'MaxRatio', 0.6);
+    matchedPointsMSERRef = refValidPointsMSER(indexPairsMSER(:, 1)); 
+    matchedPointsMSERInput = inputValidPointsMSER(indexPairsMSER(:, 2));
+    figure
+    for j= 1:3
+        if j==1 
+            subplot(1, 3,1); showMatchedFeatures(I_ref, list_image, matchedPointsHarrisRef, matchedPointsHarrisInput, 'montage');title('Harris');
+        elseif j==2 
+            subplot(1, 3,2); showMatchedFeatures(I_ref, list_image, matchedPointsSURFFRef, matchedPointsSURFFInput, 'montage');title('SURFF');
+        else
+            subplot(1, 3,3); showMatchedFeatures(I_ref, list_image, matchedPointsMSERRef, matchedPointsMSERInput, 'montage');title('MSER');
+        end 
+    end
+    k=k+1;
+end
 
-matchedRefPointsHarris = refValidPointsHarris(indexPairsHarris(:, 1));
-matchedInputPointsHarris = inputValidPointsHarris(indexPairsHarris(:, 2));
-
-figure;
-subplot(1, 1, 1); showMatchedFeatures(I, inputImage, matchedRefPointsHarris, matchedInputPointsHarris, 'montage');title('Matched Harris Features');
-
-
-
-[refFeaturesMSER,refValidPointsMSER]= extractFeatures(grayI,points3);
-[inputFeaturesMSER, inputValidPointsMSER] = extractFeatures(grayInput, points6);
-
-indexPairsMSER = matchFeatures(refFeaturesMSER, inputFeaturesMSER, 'MaxRatio', 0.5);
-
-matchedRefPointsMSER= refValidPointsMSER(indexPairsMSER(:, 1));
-matchedInputPointsMSER = inputValidPointsMSER(indexPairsMSER(:, 2));
-
-figure;
-subplot(1, 1, 1); showMatchedFeatures(I, inputImage, matchedRefPointsMSER, matchedInputPointsMSER, 'montage');title('Matched MSER Features');
 
