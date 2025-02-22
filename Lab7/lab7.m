@@ -1,8 +1,8 @@
+
 folderPath = 'F:\GitSourceTree\Computer_vision_ku\Lab7\starbucks35_dataset'; 
-fileType = '*.jpg'; % ตัวอย่างสำหรับไฟล์ภาพ .jpg
+fileType = '*.jpg'; 
 fileList = dir(fullfile(folderPath, fileType));
 fileCount = numel(fileList);
-
 
 I_ref = imread('reference_sm.jpg');  % Read the image
 grayI_ref = rgb2gray(I_ref);      % Convert to grayscale if needed
@@ -15,6 +15,7 @@ MSERpointsRef = detectMSERFeatures(grayI_ref);
 [refFeaturesMSER, refValidPointsMSER] = extractFeatures(grayI_ref, MSERpointsRef);
 k=0;
 figure;
+
 for i = 1:fileCount 
     list_image= imread(fileList(1).folder+"/"+fileList(i).name);
     grayImageInput=rgb2gray(list_image); 
@@ -48,5 +49,3 @@ for i = 1:fileCount
     end
     k=k+1;
 end
-
-

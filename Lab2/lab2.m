@@ -1,11 +1,19 @@
-imageOriginal = imread("chest.jpg");
-whos("imageOriginal")
-imageGrayScale = rgb2gray(imageOriginal);
-enhancedImage = histeq(imageGrayScale);
-adapthisteqImage=adapthisteq(imageGrayScale);
-imageAdjust=imadjust(imageGrayScale,[0.0,0.7],[0.4,0.8]);
-figure;
-subplot(2, 2, 1); imshow(imageGrayScale);title('Original Grayscale Image');
-subplot(2, 2, 2); imshow(enhancedImage);title('histeq');
-subplot(2, 2, 3); imshow(adapthisteqImage);title('adapthisteq');
-subplot(2, 2, 4); imshow(imageAdjust);title('Adjust');
+Image = imread('chest.jpg');
+
+grayImage = rgb2gray(Image);
+sigma = 2; 
+
+% B2 = imgaussfilt(noiseImage, sigma);
+pic1 = imadjust(grayImage, [0.2,0.8], [0.0, 1.0]);
+
+pic2 = histeq(pic1);
+
+pic3 = adapthisteq(grayImage,'clipLimit',0.04);
+pic4 = imadjust(grayImage, [20/255, 130/255], [0, 1]);
+
+
+
+subplot(1,4,1); imshow(Image);  title('Original Image');
+subplot(1,4,2); imshow(pic2);
+subplot(1,4,3); imshow(pic3);
+subplot(1,4,4); imshow(pic4);
